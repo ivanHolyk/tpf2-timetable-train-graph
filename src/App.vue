@@ -11,8 +11,12 @@
   <label for="namesLoad">Load state.csv file</label>
   <input id="namesLoad" @change="handleCsvUpload" type="file" accept="text/" />
 
-  <RouterLink to="/linesView">Lines view</RouterLink>
-  <RouterLink to="/stationsView">Stations view</RouterLink>
+  <RouterLink to="/linesView"
+    >Lines view {{ lineStore.lines.length }}</RouterLink
+  >
+  <RouterLink to="/stationsView"
+    >Stations view {{ stationStore.stations.length }}</RouterLink
+  >
   <span v-show="isLoading" class="loader"></span>
   <RouterView />
 </template>
@@ -22,9 +26,11 @@ import { ref, onMounted } from "vue"
 import { useLineStore } from "./stores/lines"
 import { useNameStore } from "./stores/names"
 import { parse as parseCSV } from "csv-parse/browser/esm/sync"
+import { useStationsStore } from "./stores/stations"
 
 const lineStore = useLineStore()
 const nameStore = useNameStore()
+const stationStore = useStationsStore()
 
 const luaWorker = new Worker("/luaWorker.js") // classic worker
 const timetableFile = ref(null)
