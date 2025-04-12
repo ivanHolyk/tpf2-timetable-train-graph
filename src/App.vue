@@ -27,10 +27,12 @@ import { useLineStore } from "./stores/lines"
 import { useNameStore } from "./stores/names"
 import { parse as parseCSV } from "csv-parse/browser/esm/sync"
 import { useStationsStore } from "./stores/stations"
+import { useTimetabletore } from "./stores/timetable"
 
 const lineStore = useLineStore()
 const nameStore = useNameStore()
 const stationStore = useStationsStore()
+const timetableStore = useTimetabletore()
 
 const luaWorker = new Worker("/luaWorker.js") // classic worker
 const timetableFile = ref(null)
@@ -42,8 +44,8 @@ luaWorker.onmessage = (e) => {
     console.log({ e })
     const json = JSON.parse(e.data)
     const timetable = json?.["timetable_gui.lua"] ?? {}
-    console.log({ timetable })
-    lineStore.setTimetable(timetable.timetable)
+    console.log(timetable.timetable)
+    timetableStore.setTimetable(timetable.timetable)
   } catch (err) {
     console.error("Failed to process timetable:", err)
   }
