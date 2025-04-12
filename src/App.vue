@@ -1,96 +1,108 @@
 <template>
   <label for="timetableLoad">Load save .lua file</label>
-  <input ref="file" id="timetableLoad" @change="loadSave" type="file" accept="text/">
+  <input id="timetableLoad" class="btn" @change="handleLuaFileUpload" type="file" accept="text/" />
+
   <label for="namesLoad">Load state.csv file</label>
-  <input ref="file" id="namesLoad" @change="loadCSV" type="file" accept="text/">
+  <input id="namesLoad" @change="handleCsvUpload" type="file" accept="text/" />
+
   <RouterLink to="/linesView">Lines view</RouterLink>
   <RouterLink to="/stationsView">Stations view</RouterLink>
-  <RouterView></RouterView>
-
+  <span v-show="isLoading" class="loader"></span>
+  <RouterView />
 </template>
+
 <script setup>
-import { ref } from 'vue';
-import { useLineStore } from './stores/lines';
-import { parse as parseLuaJson } from 'lua-json'
-import { parse as parseCSV } from 'csv-parse/browser/esm/sync';
-import { useNameStore } from './stores/names';
+import { ref, onMounted } from 'vue'
+import { useLineStore } from './stores/lines'
+import { useNameStore } from './stores/names'
+import { parse as parseCSV } from 'csv-parse/browser/esm/sync'
 
-
-const lineStore = useLineStore();
-const file = ref();
-const content = ref('');
+const lineStore = useLineStore()
 const nameStore = useNameStore()
 
-
-function loadSave($event) {
-  const reader = new FileReader();
-  const target = $event.target;
-  file.value = target?.files[0];
-
-  reader.addEventListener(
-    "load",
-    async () => {
-      let text = await file.value.text();
-      //trim function data() and 'end' at the end   
-      text = text.slice(16, text.length - 5)
-
-      let json = parseLuaJson(text)
-
-      let timetable = getTimetable(json).timetable;
-      console.log(timetable)
-      timetable = Object.keys(timetable).map(key => {
-        const line = { ...timetable[key], lineId: key };
-        return line;
-      });
-      console.log(timetable)
-      lineStore.setTimetable(timetable)
-      content.value = timetable;
-
-    },
-    false,
-  );
-  reader.readAsText(file.value);
-
-}
-function loadCSV($event) {
-  const reader = new FileReader();
-  const target = $event.target;
-  file.value = target?.files[0];
-
-  let names = [];
-
-  reader.addEventListener(
-    "load",
-    async () => {
-      let text = await file.value.text();
-
-      names = parseCSV(text, {
-        columns: true,
-        cast: function (value, context) {
-          //expected to be integer id column
-          if (!context.header && context.index === 0) {
-            return parseInt(value);
-          } else return value
-        },
-      })
-
-      nameStore.setNames(names)
-
-
-    },
-    false,
-  );
-  reader.readAsText(file.value);
-}
-/**
- * 
- * @param {String} input 
- * @returns {Array}
- */
-function getTimetable(json) {
-  return json["timetable_gui.lua"]
+const luaWorker = new Worker('/luaWorker.js') // classic worker
+const timetableFile = ref(null)
+const csvFile = ref(null)
+const isLoading = ref(false)
+luaWorker.onmessage = (e) => {
+  try {
+    console.log({ e })
+    const json = JSON.parse(e.data)
+    const timetable = json?.['timetable_gui.lua'] ?? {}
+    console.log({ timetable })
+    lineStore.setTimetable(timetable)
+  } catch (err) {
+    console.error('Failed to process timetable:', err)
+  }
+  isLoading.value = false
 }
 
+function handleLuaFileUpload(event) {
+  timetableFile.value = event.target.files[0]
+  if (!timetableFile.value) return
+  isLoading.value = true
+  const reader = new FileReader()
+  reader.onload = () => {
+    const rawText = reader.result
+    const trimmed = trimLuaWrapper(rawText)
+    luaWorker.postMessage(trimmed)
+  }
+  reader.readAsText(timetableFile.value)
+}
+
+function handleCsvUpload(event) {
+  csvFile.value = event.target.files[0]
+  if (!csvFile.value) return
+
+  const reader = new FileReader()
+  reader.onload = () => {
+    const csvText = reader.result
+    const parsed = parseCSV(csvText, {
+      columns: true,
+      cast: (value, ctx) => (!ctx.header && ctx.index === 0 ? parseInt(value) : value)
+    })
+    nameStore.setNames(parsed)
+  }
+  reader.readAsText(csvFile.value)
+}
+
+function trimLuaWrapper(luaText) {
+  // Remove `function data()` and trailing `end`
+  return luaText.slice(16, luaText.length - 5)
+}
+
+async function loadTimetableIfExists() {
+  isLoading.value = true
+
+  try {
+    const res = await fetch('/sandboxy.sav.lua')
+    if (!res.ok) throw new Error('Missing sandboxy.sav.lua')
+    const text = await res.text()
+    luaWorker.postMessage(trimLuaWrapper(text))
+  } catch (err) {
+    console.warn(err.message)
+  }
+}
+
+async function loadStateIfExists() {
+  try {
+    const res = await fetch('/state.csv')
+    if (!res.ok) throw new Error('Missing state.csv')
+    const csvText = await res.text()
+    const names = parseCSV(csvText, {
+      columns: true,
+      cast: (val, ctx) => (!ctx.header && ctx.index === 0 ? parseInt(val) : val)
+    })
+    nameStore.setNames(names)
+  } catch (err) {
+    console.warn(err.message)
+  }
+}
+
+onMounted(() => {
+  loadTimetableIfExists()
+  loadStateIfExists()
+})
 </script>
 
 <style scoped>
@@ -118,6 +130,25 @@ header {
     display: flex;
     place-items: flex-start;
     flex-wrap: wrap;
+  }
+}
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #00bd7e;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 </style>

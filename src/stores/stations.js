@@ -11,7 +11,7 @@ export const useStatinonsStore = defineStore('stations', () => {
     return stations
   }
   function setTimetable(timetable) {
-    let tempStations = timetable.map((line) => getStationsFromLine(line))
+    let tempStations = Object.values(timetable).map((line) => getStationsFromLine(line))
 
     console.log(tempStations)
 
