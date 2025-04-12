@@ -56,23 +56,6 @@ function handleLuaFileUpload(event) {
   reader.readAsText(timetableFile.value)
 }
 
-function handleCsvUpload(event) {
-  csvFile.value = event.target.files[0]
-  if (!csvFile.value) return
-
-  const reader = new FileReader()
-  reader.onload = () => {
-    const csvText = reader.result
-    const parsed = parseCSV(csvText, {
-      columns: true,
-      cast: (value, ctx) =>
-        !ctx.header && ctx.index === 0 ? parseInt(value) : value,
-    })
-    nameStore.setNames(parsed)
-  }
-  reader.readAsText(csvFile.value)
-}
-
 async function loadTimetableIfExists() {
   isLoading.value = true
 
@@ -86,20 +69,34 @@ async function loadTimetableIfExists() {
   }
 }
 
+function parseAndSetCsv(csvText) {
+  const parsed = parseCSV(csvText, {
+    columns: true,
+    cast: (val, ctx) => (!ctx.header && ctx.index === 0 ? parseInt(val) : val),
+  })
+  nameStore.setNames(parsed)
+}
+
 async function loadStateIfExists() {
   try {
     const res = await fetch("/state.csv")
     if (!res.ok) throw new Error("Missing state.csv")
     const csvText = await res.text()
-    const names = parseCSV(csvText, {
-      columns: true,
-      cast: (val, ctx) =>
-        !ctx.header && ctx.index === 0 ? parseInt(val) : val,
-    })
-    nameStore.setNames(names)
+    parseAndSetCsv(csvText)
   } catch (err) {
     console.warn(err.message)
   }
+}
+
+function handleCsvUpload(event) {
+  csvFile.value = event.target.files[0]
+  if (!csvFile.value) return
+
+  const reader = new FileReader()
+  reader.onload = () => {
+    parseAndSetCsv(reader.result)
+  }
+  reader.readAsText(csvFile.value)
 }
 
 onMounted(() => {
