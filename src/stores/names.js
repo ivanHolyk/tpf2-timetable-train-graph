@@ -1,7 +1,7 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
+import { ref } from "vue"
+import { defineStore } from "pinia"
 
-export const useNameStore = defineStore('names', () => {
+export const useNameStore = defineStore("names", () => {
   const names = ref([])
 
   function setNames(newNames) {

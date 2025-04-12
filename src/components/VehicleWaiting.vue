@@ -13,9 +13,9 @@
   </div>
 </template>
 <script setup>
-import { useNameStore } from '@/stores/names'
-import { getTime } from '@/timeTextUtil'
-const props = defineProps(['vehicles'])
+import { useNameStore } from "@/stores/names"
+import { getTime } from "@/timeTextUtil"
+const props = defineProps(["vehicles"])
 const vehicles = props.vehicles
 const nameStore = useNameStore()
 </script>

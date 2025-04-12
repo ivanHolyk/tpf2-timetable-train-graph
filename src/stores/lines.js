@@ -1,7 +1,7 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
+import { ref } from "vue"
+import { defineStore } from "pinia"
 
-export const useLineStore = defineStore('lines', () => {
+export const useLineStore = defineStore("lines", () => {
   const lines = ref([])
 
   function setTimetable(timetable) {

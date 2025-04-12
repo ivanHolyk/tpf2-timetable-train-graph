@@ -1,6 +1,12 @@
 <template>
   <label for="timetableLoad">Load save .lua file</label>
-  <input id="timetableLoad" class="btn" @change="handleLuaFileUpload" type="file" accept="text/" />
+  <input
+    id="timetableLoad"
+    class="btn"
+    @change="handleLuaFileUpload"
+    type="file"
+    accept="text/"
+  />
 
   <label for="namesLoad">Load state.csv file</label>
   <input id="namesLoad" @change="handleCsvUpload" type="file" accept="text/" />
@@ -12,15 +18,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useLineStore } from './stores/lines'
-import { useNameStore } from './stores/names'
-import { parse as parseCSV } from 'csv-parse/browser/esm/sync'
+import { ref, onMounted } from "vue"
+import { useLineStore } from "./stores/lines"
+import { useNameStore } from "./stores/names"
+import { parse as parseCSV } from "csv-parse/browser/esm/sync"
 
 const lineStore = useLineStore()
 const nameStore = useNameStore()
 
-const luaWorker = new Worker('/luaWorker.js') // classic worker
+const luaWorker = new Worker("/luaWorker.js") // classic worker
 const timetableFile = ref(null)
 const csvFile = ref(null)
 const isLoading = ref(false)
@@ -29,11 +35,11 @@ luaWorker.onmessage = (e) => {
   try {
     console.log({ e })
     const json = JSON.parse(e.data)
-    const timetable = json?.['timetable_gui.lua'] ?? {}
+    const timetable = json?.["timetable_gui.lua"] ?? {}
     console.log({ timetable })
     lineStore.setTimetable(timetable.timetable)
   } catch (err) {
-    console.error('Failed to process timetable:', err)
+    console.error("Failed to process timetable:", err)
   }
   isLoading.value = false
 }
@@ -59,7 +65,8 @@ function handleCsvUpload(event) {
     const csvText = reader.result
     const parsed = parseCSV(csvText, {
       columns: true,
-      cast: (value, ctx) => (!ctx.header && ctx.index === 0 ? parseInt(value) : value)
+      cast: (value, ctx) =>
+        !ctx.header && ctx.index === 0 ? parseInt(value) : value,
     })
     nameStore.setNames(parsed)
   }
@@ -70,8 +77,8 @@ async function loadTimetableIfExists() {
   isLoading.value = true
 
   try {
-    const res = await fetch('/sandboxy.sav.lua')
-    if (!res.ok) throw new Error('Missing sandboxy.sav.lua')
+    const res = await fetch("/sandboxy.sav.lua")
+    if (!res.ok) throw new Error("Missing sandboxy.sav.lua")
     const text = await res.text()
     luaWorker.postMessage(text)
   } catch (err) {
@@ -81,12 +88,13 @@ async function loadTimetableIfExists() {
 
 async function loadStateIfExists() {
   try {
-    const res = await fetch('/state.csv')
-    if (!res.ok) throw new Error('Missing state.csv')
+    const res = await fetch("/state.csv")
+    if (!res.ok) throw new Error("Missing state.csv")
     const csvText = await res.text()
     const names = parseCSV(csvText, {
       columns: true,
-      cast: (val, ctx) => (!ctx.header && ctx.index === 0 ? parseInt(val) : val)
+      cast: (val, ctx) =>
+        !ctx.header && ctx.index === 0 ? parseInt(val) : val,
     })
     nameStore.setNames(names)
   } catch (err) {

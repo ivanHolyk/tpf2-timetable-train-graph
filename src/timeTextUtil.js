@@ -1,10 +1,10 @@
 export function getTime(halfCondition) {
   let minutes = isNumber(halfCondition)
     ? Math.floor(halfCondition / 60)
-    : String(halfCondition[0]).padStart(2, '0')
+    : String(halfCondition[0]).padStart(2, "0")
   let seconds = isNumber(halfCondition)
     ? halfCondition % 60
-    : String(halfCondition[1]).padStart(2, '0')
+    : String(halfCondition[1]).padStart(2, "0")
 
   return `${minutes}:${seconds}`
 }
@@ -23,18 +23,21 @@ export function getRangeText(condition) {
   // return `${minutes}:${seconds}`
   return getTime(getRangeSeconds(condition))
 }
-import { isArray, isNumber } from 'lodash'
+import { isArray, isNumber } from "lodash"
 
 export function secondsOf(o) {
   return isArray(o) ? o[0] * 60 + o[1] : o
 }
 export function parseCondition(condition) {
-  if (condition.arrivalSeconds !== undefined && condition.departureSeconds !== undefined) {
+  if (
+    condition.arrivalSeconds !== undefined &&
+    condition.departureSeconds !== undefined
+  ) {
     return condition
   } else {
     return {
       arrivalSeconds: secondsOf(condition.slice(0, 2)),
-      departureSeconds: secondsOf(condition.slice(2))
+      departureSeconds: secondsOf(condition.slice(2)),
     }
   }
 }
@@ -81,9 +84,13 @@ export function isTimeInRange(time, condition, padding, isTouch = true) {
     }
   } else {
     if (isTouch) {
-      result = (time <= departureSeconds && time >= 0) || (time >= arrivalSeconds && time <= 3600)
+      result =
+        (time <= departureSeconds && time >= 0) ||
+        (time >= arrivalSeconds && time <= 3600)
     } else {
-      result = (time < departureSeconds && time >= 0) || (time > arrivalSeconds && time <= 3600)
+      result =
+        (time < departureSeconds && time >= 0) ||
+        (time > arrivalSeconds && time <= 3600)
     }
   }
   return result
@@ -98,28 +105,47 @@ export function isConditionsIntersect(arr1, arr2, padding = 120) {
   if (isCoditionsTouch(c1, c2, padding)) {
     return false
   }
-  if (c1.arrivalSeconds === c2.arrivalSeconds && c1.departureSeconds === c2.departureSeconds) {
+  if (
+    c1.arrivalSeconds === c2.arrivalSeconds &&
+    c1.departureSeconds === c2.departureSeconds
+  ) {
     return true
   }
 
   return (
-    isTimeInRange(arrivalWithPadding(c1.arrivalSeconds, padding), c2, padding) ||
-    isTimeInRange(departureWithPadding(c1.departureSeconds, padding), c2, padding) ||
-    isTimeInRange(arrivalWithPadding(c2.arrivalSeconds, padding), c1, padding) ||
-    isTimeInRange(departureWithPadding(c2.departureSeconds, padding), c1, padding)
+    isTimeInRange(
+      arrivalWithPadding(c1.arrivalSeconds, padding),
+      c2,
+      padding,
+    ) ||
+    isTimeInRange(
+      departureWithPadding(c1.departureSeconds, padding),
+      c2,
+      padding,
+    ) ||
+    isTimeInRange(
+      arrivalWithPadding(c2.arrivalSeconds, padding),
+      c1,
+      padding,
+    ) ||
+    isTimeInRange(
+      departureWithPadding(c2.departureSeconds, padding),
+      c1,
+      padding,
+    )
   )
 }
 export function getTimeText(condition) {
-  let result = ''
+  let result = ""
   if (condition[0] == 1) {
-    result += 'minute'
+    result += "minute"
   } else if (condition[0] > 1) {
-    result += condition[0] + ' minutes'
+    result += condition[0] + " minutes"
   }
   if (condition[1] == 1) {
-    result += ' ' + condition[1] + ' second'
+    result += " " + condition[1] + " second"
   } else if (condition[1] > 1) {
-    result += ' ' + condition[1] + ' seconds'
+    result += " " + condition[1] + " seconds"
   }
   return result
 }
@@ -131,7 +157,7 @@ export function calculateTrainAndRow(arrDep, padding) {
   if (arrDep.length == 1) {
     return {
       maxTrainsOnStationByLine: 1,
-      rowAmountToDisplayByLine: 1
+      rowAmountToDisplayByLine: 1,
     }
   }
   let trainResult = []
@@ -189,17 +215,20 @@ export function calculateTrainAndRow(arrDep, padding) {
           arrivalWithPadding(parseCondition(arrDepI).arrivalSeconds, padding),
           arrDepJ,
           padding,
-          false
+          false,
         )
       ) {
         arrResult[i]++
       }
       if (
         isTimeInRange(
-          departureWithPadding(parseCondition(arrDepI).departureSeconds, padding),
+          departureWithPadding(
+            parseCondition(arrDepI).departureSeconds,
+            padding,
+          ),
           arrDepJ,
           padding,
-          false
+          false,
         )
       ) {
         depResult[i]++
@@ -217,14 +246,16 @@ export function calculateTrainAndRow(arrDep, padding) {
   console.log(depResult)
 
   console.log(arrDep)
-  console.log('======================================')
+  console.log("======================================")
   return {
     maxTrainsOnStationByLine:
-      Math.max(...trainResult) > 0 ? Math.max(...trainResult) : arrDep.length + 1,
+      Math.max(...trainResult) > 0
+        ? Math.max(...trainResult)
+        : arrDep.length + 1,
     rowAmountToDisplayByLine:
       Math.max(...arrResult, ...depResult) > 0
         ? Math.max(...arrResult, ...depResult)
-        : arrDep.length + 1
+        : arrDep.length + 1,
     // rowAmountToDisplayByLine: Math.max(...rowResult)
   }
 }

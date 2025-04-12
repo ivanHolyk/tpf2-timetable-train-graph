@@ -27,26 +27,26 @@
   </div>
 </template>
 <script setup>
-import { computed } from 'vue'
-import { getTime, getTimeText } from '@/timeTextUtil'
-const props = defineProps(['conditions'])
+import { computed } from "vue"
+import { getTime, getTimeText } from "@/timeTextUtil"
+const props = defineProps(["conditions"])
 const conditions = props.conditions
-const activeCondition = computed(() => conditions['type'])
-const isActiveNone = () => activeCondition.value === 'None'
-const isActiveDebounce = () => activeCondition.value === 'debounce'
-const isActiveArrDep = () => activeCondition.value === 'ArrDep'
-const isActiveMoreFancey = () => activeCondition.value === 'moreFancey'
+const activeCondition = computed(() => conditions["type"])
+const isActiveNone = () => activeCondition.value === "None"
+const isActiveDebounce = () => activeCondition.value === "debounce"
+const isActiveArrDep = () => activeCondition.value === "ArrDep"
+const isActiveMoreFancey = () => activeCondition.value === "moreFancey"
 
 function isNone(condition) {
-  return condition === 'None'
+  return condition === "None"
 }
 function isDebounce(condition) {
-  return condition === 'debounce'
+  return condition === "debounce"
 }
 function isArrDep(condition) {
-  return condition === 'ArrDep'
+  return condition === "ArrDep"
 }
 function isMoreFancey(condition) {
-  return condition === 'moreFancey'
+  return condition === "moreFancey"
 }
 </script>

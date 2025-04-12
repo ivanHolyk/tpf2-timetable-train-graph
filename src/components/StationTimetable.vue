@@ -2,7 +2,10 @@
   <h1>Stations</h1>
 
   <div v-for="(station, index) in stations" :key="index">
-    <h3>Station - {{ station[0].stationID }} {{ nameStore.getName(station[0].stationID) }}</h3>
+    <h3>
+      Station - {{ station[0].stationID }}
+      {{ nameStore.getName(station[0].stationID) }}
+    </h3>
 
     <div v-for="(line, index2) in station" :key="index2" class="line-container">
       <div class="line-header">
@@ -10,7 +13,10 @@
           <span class="line-id">
             <i class="bi bi-train-front"></i>
             <!-- Train icon -->
-            <span>{{ line.line.lineId }} - {{ nameStore.getName(line.line.lineId) }}</span>
+            <span
+              >{{ line.line.lineId }} -
+              {{ nameStore.getName(line.line.lineId) }}</span
+            >
           </span>
         </div>
         <div>
@@ -25,7 +31,7 @@
         <span class="timetable">
           <i class="bi bi-clock"></i>
           <!-- Timetable icon -->
-          {{ line.line.hasTimetable ? 'Timetable Available' : 'No Timetable' }}
+          {{ line.line.hasTimetable ? "Timetable Available" : "No Timetable" }}
         </span>
         <span class="conditions">
           <i class="bi bi-info-circle"></i>
@@ -45,11 +51,11 @@
   </div>
 </template>
 <script setup>
-import { useNameStore } from '@/stores/names'
-import { useStatinonsStore } from '@/stores/stations'
-import ConditionsTable from '@/components/ConditionsTable.vue'
-import VehicleWaiting from '@/components/VehicleWaiting.vue'
-import StationLines from '@/components/StationLines.vue'
+import { useNameStore } from "@/stores/names"
+import { useStatinonsStore } from "@/stores/stations"
+import ConditionsTable from "@/components/ConditionsTable.vue"
+import VehicleWaiting from "@/components/VehicleWaiting.vue"
+import StationLines from "@/components/StationLines.vue"
 // const props = defineProps(['stations'])
 const stationStore = useStatinonsStore()
 const stations = stationStore.getStations()
@@ -62,11 +68,11 @@ function convertSecondstoTime(givenSeconds) {
   let seconds = dateObj.getSeconds()
 
   let timeString =
-    hours.toString().padStart(2, '0') +
-    ':' +
-    minutes.toString().padStart(2, '0') +
-    ':' +
-    seconds.toString().padStart(2, '0')
+    hours.toString().padStart(2, "0") +
+    ":" +
+    minutes.toString().padStart(2, "0") +
+    ":" +
+    seconds.toString().padStart(2, "0")
 
   return timeString
 }

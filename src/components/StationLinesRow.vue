@@ -5,8 +5,14 @@
       <p>{{ nameStore.getName(line.line.lineId) }}</p>
       {{ maxTrains }},{{ maxRow }}
     </td>
-    <td style="width: 100%; border-bottom: 1px solid black" :style="generateGradientForTimetable()">
-      <div style="width: 100%; position: relative; overflow: hidden" :style="getStyle()">
+    <td
+      style="width: 100%; border-bottom: 1px solid black"
+      :style="generateGradientForTimetable()"
+    >
+      <div
+        style="width: 100%; position: relative; overflow: hidden"
+        :style="getStyle()"
+      >
         <ConditionRenderer
           v-for="(condition, index) in line.conditions['ArrDep']"
           :key="index"
@@ -24,11 +30,11 @@
   </tr>
 </template>
 <script setup>
-import { useNameStore } from '@/stores/names'
-import ConditionRenderer from './ConditionRenderer.vue'
-import { calculateTrainAndRow } from '@/timeTextUtil'
+import { useNameStore } from "@/stores/names"
+import ConditionRenderer from "./ConditionRenderer.vue"
+import { calculateTrainAndRow } from "@/timeTextUtil"
 const nameStore = useNameStore()
-const props = defineProps(['line', 'displayApproachLeaveTime'])
+const props = defineProps(["line", "displayApproachLeaveTime"])
 const line = props.line
 
 //time in seconds to train to aprroach/leave station
@@ -36,17 +42,15 @@ const padding = 120
 
 const lineHeight = {
   value: 1.5,
-  unit: 'rem',
+  unit: "rem",
   total() {
     return `${this.value}${this.unit}`
-  }
+  },
 }
-const lineBottomMargin = { value: 0.25, unit: 'rem' }
+const lineBottomMargin = { value: 0.25, unit: "rem" }
 
-const { maxTrainsOnStationByLine, rowAmountToDisplayByLine } = calculateTrainAndRow(
-  line.conditions?.ArrDep,
-  padding
-)
+const { maxTrainsOnStationByLine, rowAmountToDisplayByLine } =
+  calculateTrainAndRow(line.conditions?.ArrDep, padding)
 const maxTrains = maxTrainsOnStationByLine
 const maxRow = rowAmountToDisplayByLine
 
@@ -57,7 +61,7 @@ function generateGradientForTimetable() {
 
   const addStop = (position, color) => {
     gradientStops.push(
-      `white ${position}%, ${color} ${position}% calc(${position}% + 1px), white calc(${position}% + 1px)`
+      `white ${position}%, ${color} ${position}% calc(${position}% + 1px), white calc(${position}% + 1px)`,
     )
   }
   // Loop through each 10-minute interval
@@ -66,25 +70,28 @@ function generateGradientForTimetable() {
 
     if (position == 100) {
       gradientStops.push(
-        `white calc(${position}% - 1px), black calc(${position}% - 1px) ${position}% `
+        `white calc(${position}% - 1px), black calc(${position}% - 1px) ${position}% `,
       )
     } else {
       if (i % 10 === 0) {
         // Black lines every 10 minutes
-        addStop(position, 'black')
+        addStop(position, "black")
       } else if (i % 5 === 0) {
         // Dark gray lines every 5 minutes
-        addStop(position, 'darkgray')
+        addStop(position, "darkgray")
       } else {
         // Light gray lines every minute
-        addStop(position, 'lightgray')
+        addStop(position, "lightgray")
       }
     }
   }
 
-  let gradientString = gradientStops.join(', ')
+  let gradientString = gradientStops.join(", ")
 
-  return { backgroundColor: 'white', background: `linear-gradient(to right, ${gradientString})` }
+  return {
+    backgroundColor: "white",
+    background: `linear-gradient(to right, ${gradientString})`,
+  }
 }
 
 function getStyle() {
@@ -92,7 +99,7 @@ function getStyle() {
   let height = 0
   height = (lineHeight.value + lineBottomMargin.value) * maxRow
 
-  style.height = height + 'rem'
+  style.height = height + "rem"
   return style
 }
 

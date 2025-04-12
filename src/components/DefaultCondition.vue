@@ -1,5 +1,8 @@
 <template>
-  <div style="margin-bottom: 0.25rem; position: absolute" :style="getPaddingDrawInfo(condition)">
+  <div
+    style="margin-bottom: 0.25rem; position: absolute"
+    :style="getPaddingDrawInfo(condition)"
+  >
     <div
       style="position: relative; display: flex; justify-content: center"
       :style="getDrawInfo(condition)"
@@ -28,16 +31,20 @@
   </div>
 </template>
 <script setup>
-import { getRangeText, parseCondition, isArrivalBeforeDeparture } from '@/timeTextUtil'
-import { computed } from 'vue'
+import {
+  getRangeText,
+  parseCondition,
+  isArrivalBeforeDeparture,
+} from "@/timeTextUtil"
+import { computed } from "vue"
 const props = defineProps([
-  'condition',
-  'displayApproachLeaveTime',
-  'index',
-  'padding',
-  'lineHeight',
-  'lineBottomMargin',
-  'row'
+  "condition",
+  "displayApproachLeaveTime",
+  "index",
+  "padding",
+  "lineHeight",
+  "lineBottomMargin",
+  "row",
 ])
 
 const lineHeight = props.lineHeight
@@ -56,7 +63,7 @@ const paddingWidth = paddingRight - paddingLeft
 const thereIsSecondPart = computed(
   () =>
     !isArrivalBeforeDeparture(departureSeconds, arrivalSeconds) &&
-    departureSeconds != arrivalSeconds
+    departureSeconds != arrivalSeconds,
 )
 
 function getFractionBySeconds(seconds, leftPadding = 0) {
@@ -66,27 +73,27 @@ function getFractionBySeconds(seconds, leftPadding = 0) {
 function getDrawInfo() {
   let style = {}
   style.height = lineHeight
-  style.backgroundColor = 'red'
-  style.borderRadius = '0.5rem'
-  style.margin = 'auto'
+  style.backgroundColor = "red"
+  style.borderRadius = "0.5rem"
+  style.margin = "auto"
 
   if (isArrivalBeforeDeparture(departureSeconds, arrivalSeconds)) {
     const width = getFractionBySeconds(departureSeconds - arrivalSeconds)
-    style.width = (width / paddingWidth) * 100 + '%'
+    style.width = (width / paddingWidth) * 100 + "%"
   } else {
     const left = getFractionBySeconds(departureSeconds)
     const right = getFractionBySeconds(arrivalSeconds)
 
     style.background =
-      'linear-gradient(to right,  red ' +
+      "linear-gradient(to right,  red " +
       left +
-      '%, transparent ' +
+      "%, transparent " +
       left +
-      '%, transparent ' +
+      "%, transparent " +
       right +
-      '%, red ' +
+      "%, red " +
       right +
-      '%)'
+      "%)"
   }
   return style
 }
@@ -95,35 +102,35 @@ function getPaddingDrawInfo() {
   let style = {}
 
   style.height = lineHeight.value + lineHeight.value
-  style.borderRadius = '0.5rem'
+  style.borderRadius = "0.5rem"
 
-  style.minWidth = paddingWidth + '%'
+  style.minWidth = paddingWidth + "%"
 
   if (props.displayApproachLeaveTime) {
-    style.backgroundColor = 'green'
+    style.backgroundColor = "green"
   }
 
   if (arrivalSeconds === departureSeconds) {
-    style.marginLeft = paddingRight + '%'
+    style.marginLeft = paddingRight + "%"
   } else if (isArrivalBeforeDeparture(departureSeconds, arrivalSeconds)) {
-    style.marginLeft = paddingLeft + '%'
-    style.minWidth = paddingWidth + '%'
+    style.marginLeft = paddingLeft + "%"
+    style.minWidth = paddingWidth + "%"
   } else {
     const left = getFractionBySeconds(departureSeconds)
     const right = getFractionBySeconds(arrivalSeconds)
     style.background =
-      'linear-gradient(to right,  red ' +
+      "linear-gradient(to right,  red " +
       left +
-      '%, transparent ' +
+      "%, transparent " +
       left +
-      '%, transparent ' +
+      "%, transparent " +
       right +
-      '%, red ' +
+      "%, red " +
       right +
-      '%)'
+      "%)"
   }
 
-  style.top = (lineHeight.value + lineBottomMargin.value) * row + 'rem'
+  style.top = (lineHeight.value + lineBottomMargin.value) * row + "rem"
   return style
 }
 </script>

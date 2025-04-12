@@ -1,7 +1,7 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
-import { isArray } from 'lodash'
-export const useStatinonsStore = defineStore('stations', () => {
+import { ref } from "vue"
+import { defineStore } from "pinia"
+import { isArray } from "lodash"
+export const useStatinonsStore = defineStore("stations", () => {
   const stations = ref([])
 
   function pushStation(station) {
@@ -11,7 +11,9 @@ export const useStatinonsStore = defineStore('stations', () => {
     return stations
   }
   function setTimetable(timetable) {
-    let tempStations = Object.values(timetable).map((line) => getStationsFromLine(line))
+    let tempStations = Object.values(timetable).map((line) =>
+      getStationsFromLine(line),
+    )
 
     console.log(tempStations)
 

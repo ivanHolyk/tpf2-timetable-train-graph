@@ -1,5 +1,8 @@
 <template>
-  <div style="margin-bottom: 0.25rem; position: absolute" :style="getPaddingDrawInfoLeft()">
+  <div
+    style="margin-bottom: 0.25rem; position: absolute"
+    :style="getPaddingDrawInfoLeft()"
+  >
     <div
       style="position: relative; display: flex; justify-content: center"
       :style="getDrawInfoLeft()"
@@ -9,7 +12,10 @@
       </span>
     </div>
   </div>
-  <div style="margin-bottom: 0.25rem; position: absolute" :style="getPaddingDrawInfoRight()">
+  <div
+    style="margin-bottom: 0.25rem; position: absolute"
+    :style="getPaddingDrawInfoRight()"
+  >
     <div
       style="position: relative; display: flex; justify-content: center"
       :style="getDrawInfoRight()"
@@ -21,15 +27,15 @@
   </div>
 </template>
 <script setup>
-import { parseCondition } from '@/timeTextUtil'
+import { parseCondition } from "@/timeTextUtil"
 const props = defineProps([
-  'condition',
-  'displayApproachLeaveTime',
-  'index',
-  'padding',
-  'lineHeight',
-  'lineBottomMargin',
-  'row'
+  "condition",
+  "displayApproachLeaveTime",
+  "index",
+  "padding",
+  "lineHeight",
+  "lineBottomMargin",
+  "row",
 ])
 
 const lineHeight = props.lineHeight
@@ -51,22 +57,22 @@ function getFractionBySeconds(seconds, leftPadding = 0) {
 function getDrawInfoLeft() {
   let style = {}
   style.height = lineHeight.total()
-  style.backgroundColor = 'red'
-  style.borderRadius = '0.5rem'
+  style.backgroundColor = "red"
+  style.borderRadius = "0.5rem"
 
   checkBorderRadius(style, false, false)
   const left = getFractionBySeconds(departureSeconds)
 
-  style.width = (left / paddingLeft) * 100 + '%'
+  style.width = (left / paddingLeft) * 100 + "%"
 
   return style
 }
 function getDrawInfoRight() {
   let style = {}
   style.height = lineHeight.total()
-  style.backgroundColor = 'red'
-  style.borderRadius = '0.5rem'
-  style.margin = 'auto'
+  style.backgroundColor = "red"
+  style.borderRadius = "0.5rem"
+  style.margin = "auto"
 
   checkBorderRadius(style, true, false)
   if (arrivalSeconds === 0) {
@@ -76,7 +82,7 @@ function getDrawInfoRight() {
       (getFractionBySeconds(3600 - arrivalSeconds) /
         getFractionBySeconds(3600 - arrivalSeconds + padding)) *
         100 +
-      '%'
+      "%"
   }
   style.marginRight = 0
 
@@ -87,17 +93,17 @@ function getPaddingDrawInfoLeft() {
   let style = {}
 
   style.height = lineHeight.total()
-  style.borderRadius = '0.5rem'
+  style.borderRadius = "0.5rem"
 
   // style.minWidth = paddingWidth + '%';
   checkBorderRadius(style, false, true)
   if (props.displayApproachLeaveTime) {
-    style.backgroundColor = 'green'
+    style.backgroundColor = "green"
   }
 
-  style.width = paddingLeft + '%'
+  style.width = paddingLeft + "%"
 
-  style.top = (lineHeight.value + lineBottomMargin.value) * row + 'rem'
+  style.top = (lineHeight.value + lineBottomMargin.value) * row + "rem"
   return style
 }
 
@@ -105,40 +111,40 @@ function getPaddingDrawInfoRight() {
   let style = {}
 
   style.height = lineHeight.total()
-  style.borderRadius = '0.5rem'
+  style.borderRadius = "0.5rem"
 
   // style.minWidth = paddingWidth + '%';
   checkBorderRadius(style, true, true)
   if (props.displayApproachLeaveTime) {
-    style.backgroundColor = 'green'
+    style.backgroundColor = "green"
   }
   if (arrivalSeconds === 0) {
     const right = getFractionBySeconds(3600 - padding)
-    style.marginLeft = right + '%'
-    style.width = getFractionBySeconds(padding) + '%'
+    style.marginLeft = right + "%"
+    style.width = getFractionBySeconds(padding) + "%"
   } else {
-    style.marginLeft = paddingRight + '%'
-    style.width = getFractionBySeconds(3600 - arrivalSeconds + padding) + '%'
+    style.marginLeft = paddingRight + "%"
+    style.width = getFractionBySeconds(3600 - arrivalSeconds + padding) + "%"
   }
-  style.top = (lineHeight.value + lineBottomMargin.value) * row + 'rem'
+  style.top = (lineHeight.value + lineBottomMargin.value) * row + "rem"
   return style
 }
 function checkBorderRadius(style, isRight, isPadding) {
   if (isPadding) {
     if (isRight) {
-      style.borderTopRightRadius = '0'
-      style.borderBottomRightRadius = '0'
+      style.borderTopRightRadius = "0"
+      style.borderBottomRightRadius = "0"
     } else {
-      style.borderTopLeftRadius = '0'
-      style.borderBottomLeftRadius = '0'
+      style.borderTopLeftRadius = "0"
+      style.borderBottomLeftRadius = "0"
     }
   } else {
     if (isRight && (arrivalSeconds != 3600 || departureSeconds != 3600)) {
-      style.borderTopRightRadius = '0'
-      style.borderBottomRightRadius = '0'
+      style.borderTopRightRadius = "0"
+      style.borderBottomRightRadius = "0"
     } else if (arrivalSeconds != 0 && departureSeconds != 0) {
-      style.borderTopLeftRadius = '0'
-      style.borderBottomLeftRadius = '0'
+      style.borderTopLeftRadius = "0"
+      style.borderBottomLeftRadius = "0"
     }
   }
 }

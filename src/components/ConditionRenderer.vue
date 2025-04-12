@@ -31,19 +31,19 @@
   ></DotCondition>
 </template>
 <script setup>
-import { parseCondition, isArrivalBeforeDeparture } from '@/timeTextUtil'
-import { computed } from 'vue'
-import DefaultCondition from './DefaultCondition.vue'
-import SeparatedCondition from './SeparatedCondition.vue'
-import DotCondition from './DotCondition.vue'
+import { parseCondition, isArrivalBeforeDeparture } from "@/timeTextUtil"
+import { computed } from "vue"
+import DefaultCondition from "./DefaultCondition.vue"
+import SeparatedCondition from "./SeparatedCondition.vue"
+import DotCondition from "./DotCondition.vue"
 const props = defineProps([
-  'condition',
-  'displayApproachLeaveTime',
-  'index',
-  'padding',
-  'lineHeight',
-  'lineBottomMargin',
-  'row'
+  "condition",
+  "displayApproachLeaveTime",
+  "index",
+  "padding",
+  "lineHeight",
+  "lineBottomMargin",
+  "row",
 ])
 
 const lineHeight = props.lineHeight
@@ -59,13 +59,13 @@ const isDefaultCondition = computed(
   () =>
     isArrivalBeforeDeparture(departureSeconds, arrivalSeconds) &&
     departureSeconds != arrivalSeconds &&
-    arrivalSeconds != 0
+    arrivalSeconds != 0,
 )
 const isSeparatedCondition = computed(
   () =>
     (!isArrivalBeforeDeparture(departureSeconds, arrivalSeconds) &&
       departureSeconds != arrivalSeconds) ||
-    (arrivalSeconds === 0 && departureSeconds != arrivalSeconds)
+    (arrivalSeconds === 0 && departureSeconds != arrivalSeconds),
 )
 const isDotCondition = computed(() => arrivalSeconds === departureSeconds)
 </script>
