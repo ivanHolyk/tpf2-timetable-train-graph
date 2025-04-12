@@ -24,13 +24,14 @@ const luaWorker = new Worker('/luaWorker.js') // classic worker
 const timetableFile = ref(null)
 const csvFile = ref(null)
 const isLoading = ref(false)
+
 luaWorker.onmessage = (e) => {
   try {
     console.log({ e })
     const json = JSON.parse(e.data)
     const timetable = json?.['timetable_gui.lua'] ?? {}
     console.log({ timetable })
-    lineStore.setTimetable(timetable)
+    lineStore.setTimetable(timetable.timetable)
   } catch (err) {
     console.error('Failed to process timetable:', err)
   }
@@ -44,8 +45,7 @@ function handleLuaFileUpload(event) {
   const reader = new FileReader()
   reader.onload = () => {
     const rawText = reader.result
-    const trimmed = trimLuaWrapper(rawText)
-    luaWorker.postMessage(trimmed)
+    luaWorker.postMessage(rawText)
   }
   reader.readAsText(timetableFile.value)
 }
@@ -66,11 +66,6 @@ function handleCsvUpload(event) {
   reader.readAsText(csvFile.value)
 }
 
-function trimLuaWrapper(luaText) {
-  // Remove `function data()` and trailing `end`
-  return luaText.slice(16, luaText.length - 5)
-}
-
 async function loadTimetableIfExists() {
   isLoading.value = true
 
@@ -78,7 +73,7 @@ async function loadTimetableIfExists() {
     const res = await fetch('/sandboxy.sav.lua')
     if (!res.ok) throw new Error('Missing sandboxy.sav.lua')
     const text = await res.text()
-    luaWorker.postMessage(trimLuaWrapper(text))
+    luaWorker.postMessage(text)
   } catch (err) {
     console.warn(err.message)
   }

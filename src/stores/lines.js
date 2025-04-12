@@ -1,14 +1,13 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { useStatinonsStore } from '@/stores/stations'
 
 export const useLineStore = defineStore('lines', () => {
   const lines = ref([])
-  const stationStore = useStatinonsStore()
 
   function setTimetable(timetable) {
-    stationStore.setTimetable(timetable)
-    lines.value = timetable
+    lines.value = Object.entries(timetable).map((e) => {
+      return { ...e[1], id: e[0] }
+    })
   }
   function getLines() {
     return lines

@@ -29,6 +29,7 @@ export const useStatinonsStore = defineStore('stations', () => {
 
   return { stations, pushStation, getStations, setTimetable }
 })
+
 function flatArray(arr) {
   let result = []
   if (isArray(arr)) {
@@ -52,6 +53,7 @@ function flatArray(arr) {
 function isStation(o) {
   return o.conditions ? true : false
 }
+
 function getStationsFromLine(line) {
   let result = []
   let st = flatArray(line.stations)
