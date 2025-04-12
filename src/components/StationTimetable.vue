@@ -52,12 +52,12 @@
 </template>
 <script setup>
 import { useNameStore } from "@/stores/names"
-import { useStatinonsStore } from "@/stores/stations"
+import { useStationsStore } from "@/stores/stations"
 import ConditionsTable from "@/components/ConditionsTable.vue"
 import VehicleWaiting from "@/components/VehicleWaiting.vue"
 import StationLines from "@/components/StationLines.vue"
 // const props = defineProps(['stations'])
-const stationStore = useStatinonsStore()
+const stationStore = useStationsStore()
 const stations = stationStore.getStations()
 
 const nameStore = useNameStore()

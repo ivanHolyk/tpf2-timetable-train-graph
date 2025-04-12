@@ -1,7 +1,8 @@
 import { ref } from "vue"
 import { defineStore } from "pinia"
 import { isArray } from "lodash"
-export const useStatinonsStore = defineStore("stations", () => {
+
+export const useStationsStore = defineStore("stations", () => {
   const stations = ref([])
 
   function pushStation(station) {
