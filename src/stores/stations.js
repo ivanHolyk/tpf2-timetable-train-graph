@@ -2,36 +2,40 @@ import { ref } from "vue"
 import { defineStore } from "pinia"
 import { isArray } from "lodash"
 
-export const useStationsStore = defineStore("stations", () => {
-  const stations = ref([])
+export const useStationsStore = defineStore(
+  "stations",
+  () => {
+    const stations = ref([])
 
-  function pushStation(station) {
-    stations.value.push(station)
-  }
-  function getStations() {
-    return stations
-  }
-  function setTimetable(timetable) {
-    let tempStations = Object.values(timetable).map((line) =>
-      getStationsFromLine(line),
-    )
+    function pushStation(station) {
+      stations.value.push(station)
+    }
+    function getStations() {
+      return stations
+    }
+    function setTimetable(timetable) {
+      let tempStations = Object.values(timetable).map((line) =>
+        getStationsFromLine(line),
+      )
 
-    console.log(tempStations)
+      console.log(tempStations)
 
-    tempStations = tempStations.map((s) => {
-      return flatArray(s)
-    })
-    console.log(tempStations)
-    tempStations = tempStations.flat()
-    console.log(tempStations)
+      tempStations = tempStations.map((s) => {
+        return flatArray(s)
+      })
+      console.log(tempStations)
+      tempStations = tempStations.flat()
+      console.log(tempStations)
 
-    let result = Object.groupBy(tempStations, ({ stationID }) => stationID)
-    console.log(result)
-    stations.value = result
-  }
+      let result = Object.groupBy(tempStations, ({ stationID }) => stationID)
+      console.log(result)
+      stations.value = result
+    }
 
-  return { stations, pushStation, getStations, setTimetable }
-})
+    return { stations, pushStation, getStations, setTimetable }
+  },
+  { persist: true },
+)
 
 function flatArray(arr) {
   let result = []

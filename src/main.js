@@ -7,8 +7,12 @@ import App from "./App.vue"
 import router from "./router"
 
 import "bootstrap-icons/font/bootstrap-icons.css"
+import { createPersistedState } from "pinia-plugin-persistedstate"
 const app = createApp(App)
 
-app.use(createPinia()).use(router)
+const pinia = createPinia()
+pinia.use(createPersistedState())
+
+app.use(pinia).use(router)
 
 app.mount("#app")

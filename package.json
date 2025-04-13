@@ -20,6 +20,7 @@
     "luaparse": "^0.3.1",
     "nyc": "^17.0.0",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^4.2.0",
     "vue": "^3.4.21",
     "vue-router": "^4.4.0"
   },
