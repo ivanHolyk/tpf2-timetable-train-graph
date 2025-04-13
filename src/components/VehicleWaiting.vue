@@ -6,8 +6,7 @@
     <p>Departure: {{ vehicle.departureTime }}</p>
     <p v-if="vehicle.slot">
       Slot:
-      <span>Arr: {{ getTime(vehicle.slot.slice(0, 2)) }}</span>
-      <span>Dep: {{ getTime(vehicle.slot.slice(2)) }}</span>
+      {{ vehicle.slot }}
     </p>
     <hr />
   </div>

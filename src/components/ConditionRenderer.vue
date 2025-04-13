@@ -47,13 +47,17 @@ const props = defineProps([
 ])
 
 const lineHeight = props.lineHeight
-const condition = props.condition
+const condition = Object.values(props.condition)
 const index = props.index
 const padding = props.padding
 const lineBottomMargin = props.lineBottomMargin
 const row = props.row
 
-const { arrivalSeconds, departureSeconds } = parseCondition(condition)
+console.log(condition)
+
+const { arrivalSeconds, departureSeconds } = parseCondition(
+  Object.values(condition),
+)
 
 const isDefaultCondition = computed(
   () =>

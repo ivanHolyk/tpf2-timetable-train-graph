@@ -1,11 +1,12 @@
 import { createRouter, createMemoryHistory } from "vue-router"
 
-import LineList from "./components/LineList.vue"
-import StationTimetable from "./components/StationTimetable.vue"
+import LineList from "@/view/LineList.vue"
+import StationTimetable from "@/view/StationTimetable.vue"
 
 const routes = [
-  { path: "/linesView", component: LineList },
-  { path: "/stationsView", component: StationTimetable },
+  // { path: "/", component: App },
+  { path: "/lines", component: LineList },
+  { path: "/stations", component: StationTimetable },
 ]
 
 const router = createRouter({

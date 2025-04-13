@@ -17,8 +17,9 @@
           <th>Departure</th>
         </thead>
         <tr v-for="(time, index2) in condition" :key="index2">
-          <td>{{ getTime(time.slice(0, 2)) }}</td>
-          <td>{{ getTime(time.slice(2)) }}</td>
+          {{
+            time
+          }}
         </tr>
       </table>
       <hr />

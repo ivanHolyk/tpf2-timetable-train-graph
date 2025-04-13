@@ -8,9 +8,10 @@ export const useLineStore = defineStore(
 
     function setTimetable(timetable) {
       lines.value = Object.entries(timetable).map((e) => {
-        return { ...e[1], id: e[0] }
+        return { ...e[1], id: e[0], stations: Object.values(e[1].stations) }
       })
     }
+
     function getLines() {
       return lines
     }

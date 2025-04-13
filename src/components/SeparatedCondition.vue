@@ -45,8 +45,9 @@ const padding = props.padding
 const lineBottomMargin = props.lineBottomMargin
 const row = props.row
 
-const { arrivalSeconds, departureSeconds } = parseCondition(condition)
-
+const { arrivalSeconds, departureSeconds } = parseCondition(
+  Object.values(condition),
+)
 const paddingRight = getFractionBySeconds(arrivalSeconds - padding)
 const paddingLeft = getFractionBySeconds(departureSeconds + padding)
 
