@@ -11,11 +11,9 @@
   <label for="namesLoad">Load state.csv file</label>
   <input id="namesLoad" @change="handleCsvUpload" type="file" accept="text/" />
 
-  <RouterLink to="/linesView"
-    >Lines view {{ lineStore.lines.length }}</RouterLink
-  >
-  <RouterLink to="/stationsView"
-    >Stations view {{ stationStore.stations.length }}</RouterLink
+  <RouterLink to="/lines">Lines view {{ lineStore.lines.length }}</RouterLink>
+  <RouterLink to="/stations"
+    >Stations view {{ Object.keys(stationStore.stations).length }}</RouterLink
   >
   <span v-show="isLoading" class="loader"></span>
   <RouterView />
@@ -23,16 +21,18 @@
 
 <script setup>
 import { ref, onMounted } from "vue"
-import { useLineStore } from "./stores/lines"
-import { useNameStore } from "./stores/names"
+
 import { parse as parseCSV } from "csv-parse/browser/esm/sync"
-import { useStationsStore } from "./stores/stations"
-import { useTimetabletore } from "./stores/timetable"
+
+import { useLineStore } from "@/stores/lines"
+import { useNameStore } from "@/stores/names"
+import { useStationsStore } from "@/stores/stations"
+import { useTimetableStore } from "@/stores/timetable"
 
 const lineStore = useLineStore()
 const nameStore = useNameStore()
 const stationStore = useStationsStore()
-const timetableStore = useTimetabletore()
+const timetableStore = useTimetableStore()
 
 const luaWorker = new Worker("/luaWorker.js") // classic worker
 const timetableFile = ref(null)
@@ -65,6 +65,9 @@ function handleLuaFileUpload(event) {
 }
 
 async function loadTimetableIfExists() {
+  if (timetableStore.timetable) {
+    return
+  }
   isLoading.value = true
 
   try {

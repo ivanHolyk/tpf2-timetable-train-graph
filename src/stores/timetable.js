@@ -3,7 +3,7 @@ import { defineStore } from "pinia"
 import { useStationsStore } from "@/stores/stations"
 import { useLineStore } from "./lines"
 
-export const useTimetabletore = defineStore(
+export const useTimetableStore = defineStore(
   "timetable",
   () => {
     const timetable = ref()
