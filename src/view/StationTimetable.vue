@@ -56,26 +56,12 @@ import { useStationsStore } from "@/stores/stations"
 import ConditionsTable from "@/components/ConditionsTable.vue"
 import VehicleWaiting from "@/components/VehicleWaiting.vue"
 import StationLines from "@/components/StationLines.vue"
+import { convertSecondstoTime } from "@/timeTextUtil"
 // const props = defineProps(['stations'])
 const stationStore = useStationsStore()
 const stations = stationStore.getStations()
 
 const nameStore = useNameStore()
-function convertSecondstoTime(givenSeconds) {
-  let dateObj = new Date(givenSeconds * 1000)
-  let hours = dateObj.getUTCHours()
-  let minutes = dateObj.getUTCMinutes()
-  let seconds = dateObj.getSeconds()
-
-  let timeString =
-    hours.toString().padStart(2, "0") +
-    ":" +
-    minutes.toString().padStart(2, "0") +
-    ":" +
-    seconds.toString().padStart(2, "0")
-
-  return timeString
-}
 </script>
 <style>
 .line-container {

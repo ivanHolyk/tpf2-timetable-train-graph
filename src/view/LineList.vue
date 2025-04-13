@@ -11,7 +11,7 @@
 </template>
 <script setup>
 import { useLineStore } from "@/stores/lines"
-import LineComponent from "./LineComponent.vue"
+import LineComponent from "@/components/LineComponent.vue"
 
 const lineStore = useLineStore()
 const lines = lineStore.getLines()

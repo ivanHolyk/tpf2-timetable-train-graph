@@ -275,3 +275,19 @@ export function arrivalWithPadding(time, padding) {
 export function departureWithPadding(time, padding) {
   return time + padding < 3600 ? time + padding : time + padding - 3600
 }
+
+export function convertSecondstoTime(givenSeconds) {
+  let dateObj = new Date(givenSeconds * 1000)
+  let hours = dateObj.getUTCHours()
+  let minutes = dateObj.getUTCMinutes()
+  let seconds = dateObj.getSeconds()
+
+  let timeString =
+    hours.toString().padStart(2, "0") +
+    ":" +
+    minutes.toString().padStart(2, "0") +
+    ":" +
+    seconds.toString().padStart(2, "0")
+
+  return timeString
+}
