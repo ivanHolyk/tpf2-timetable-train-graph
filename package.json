@@ -15,6 +15,7 @@
     "@vueuse/core": "^10.11.0",
     "bootstrap-icons": "^1.11.3",
     "csv-parse": "^5.5.6",
+    "d3": "^7.9.0",
     "lodash": "^4.17.21",
     "lua-json": "^1.0.1",
     "luaparse": "^0.3.1",
