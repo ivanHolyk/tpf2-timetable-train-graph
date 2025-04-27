@@ -1,4 +1,4 @@
-import { createRouter, createMemoryHistory } from "vue-router"
+import { createRouter, createWebHistory } from "vue-router"
 
 import LineList from "@/view/LineList.vue"
 import StationTimetable from "@/view/StationTimetable.vue"
@@ -10,7 +10,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(),
   routes,
 })
 
