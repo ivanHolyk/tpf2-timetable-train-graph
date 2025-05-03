@@ -38,6 +38,9 @@ const lineName = computed(() => {
 const lineStore = useLineStore()
 const timetableStore = useTimetableStore()
 
+import { useConnectedLinesStore } from "@/stores/connectedLines"
+const connectedStore = useConnectedLinesStore()
+
 // Shared access
 let x, y, g, margin
 
@@ -56,12 +59,14 @@ function transformToMareyData(timetable) {
         Object.values(c),
       )
       points.push({
-        stationID: nameStore.getName(station.stationID),
+        stationID: station.stationID, // numeric ID
+        stationName: nameStore.getName(station.stationID), // human-readable
         time: arrivalSeconds,
         type: "arr",
       })
       points.push({
-        stationID: nameStore.getName(station.stationID),
+        stationID: station.stationID,
+        stationName: nameStore.getName(station.stationID),
         time: departureSeconds,
         type: "dep",
       })
@@ -92,6 +97,8 @@ function drawFloatingLine(event, dep) {
 }
 
 function createConnection(from, to) {
+  connectedStore.addConnection(from, to)
+
   g.append("line")
     .attr("x1", x(from.time))
     .attr("y1", y(from.stationID))
@@ -120,21 +127,23 @@ function drawMareyGraph(svgEl, data) {
     .range([0, innerHeight])
     .padding(0.5)
 
+  const idToName = new Map()
+  data.forEach((d) => {
+    if (!idToName.has(d.stationID)) {
+      idToName.set(d.stationID, d.stationName)
+    }
+  })
+
   g = svgSelection
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`)
 
   g.append("g")
-    .attr("class", "axis") // ← ADD THIS
-    .call(d3.axisLeft(y))
+    .attr("class", "axis")
+    .call(d3.axisLeft(y).tickFormat((d) => idToName.get(d)))
 
   g.append("g")
-    .attr("class", "axis") // ← ADD THIS
-    .attr("transform", `translate(0,${innerHeight})`)
-    .call(d3.axisBottom(x))
-
-  g.append("g").call(d3.axisLeft(y))
-  g.append("g")
+    .attr("class", "axis")
     .attr("transform", `translate(0,${innerHeight})`)
     .call(d3.axisBottom(x))
 
@@ -179,30 +188,40 @@ function drawMareyGraph(svgEl, data) {
           .attr("stroke-width", 1)
       }
     })
-
-    g.selectAll("circle")
-      .data(data)
-      .enter()
-      .append("circle")
-      .attr("cx", (d) => x(d.time))
-      .attr("cy", (d) => y(d.stationID))
-      .attr("r", 4)
-      .attr("fill", (d) => (d.type === "arr" ? "red" : "green"))
-      .on("click", (event, d) => {
-        if (!editorMode.value) return
-
-        if (d.type === "dep") {
-          console.log({ d })
-          activeDep.value = d
-          drawFloatingLine(event, d)
-        } else if (d.type === "arr" && activeDep.value) {
-          console.log("there is connector about to connect")
-          createConnection(activeDep.value, d)
-          activeDep.value = null
-          d3.select(svg.value).selectAll(".floating-line").remove()
-        }
-      })
   })
+
+  g.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", (d) => x(d.time))
+    .attr("cy", (d) => y(d.stationID))
+    .attr("r", 4)
+    .attr("fill", (d) => (d.type === "arr" ? "red" : "green"))
+    .on("click", (event, d) => {
+      if (!editorMode.value) return
+
+      if (d.type === "dep") {
+        console.log({ d })
+        activeDep.value = d
+        drawFloatingLine(event, d)
+      } else if (d.type === "arr" && activeDep.value) {
+        console.log("there is connector about to connect")
+        createConnection(activeDep.value, d)
+        activeDep.value = null
+        d3.select(svg.value).selectAll(".floating-line").remove()
+      }
+    })
+
+  for (const conn of connectedStore.connections) {
+    g.append("line")
+      .attr("x1", x(conn.from.time))
+      .attr("y1", y(conn.from.stationID))
+      .attr("x2", x(conn.to.time))
+      .attr("y2", y(conn.to.stationID))
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+  }
 }
 </script>
 <style scoped>
