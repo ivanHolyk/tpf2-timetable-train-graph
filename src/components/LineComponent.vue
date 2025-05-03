@@ -11,6 +11,17 @@
       <svg ref="svg" :width="width" :height="height"></svg>
     </div>
   </div>
+  <div
+    id="tooltip"
+    class="tooltip"
+    v-show="tooltip.visible"
+    :style="tooltip.style"
+  >
+    <strong>{{ tooltip.stationName }}</strong
+    ><br />
+    Arrival: {{ tooltip.arrival }}<br />
+    Departure: {{ tooltip.departure }}
+  </div>
 </template>
 <script setup>
 import { useNameStore } from "@/stores/names"
@@ -40,6 +51,14 @@ const timetableStore = useTimetableStore()
 
 import { useConnectedLinesStore } from "@/stores/connectedLines"
 const connectedStore = useConnectedLinesStore()
+
+const tooltip = ref({
+  visible: false,
+  style: {},
+  stationName: "",
+  arrival: "",
+  departure: "",
+})
 
 // Shared access
 let x, y, g, margin
@@ -97,7 +116,7 @@ function drawFloatingLine(event, dep) {
 }
 
 function createConnection(from, to) {
-  connectedStore.addConnection(from, to)
+  connectedStore.addConnection(from, to, line.id)
 
   g.append("line")
     .attr("x1", x(from.time))
@@ -147,6 +166,25 @@ function drawMareyGraph(svgEl, data) {
     .attr("transform", `translate(0,${innerHeight})`)
     .call(d3.axisBottom(x))
 
+  function showTooltip(event, { stationID, arr, dep }) {
+    if (editorMode.value) return
+    tooltip.value.visible = true
+    tooltip.value.stationName = idToName.get(stationID)
+    tooltip.value.arrival = convertSecondstoTime(arr)
+    tooltip.value.departure = convertSecondstoTime(dep)
+    tooltip.value.style = {
+      left: `${event.pageX + 10}px`,
+      top: `${event.pageY + 10}px`,
+      position: "absolute",
+    }
+  }
+
+  function hideTooltip() {
+    tooltip.value.visible = false
+  }
+
+  const slotMap = new Map()
+
   // Draw default station-side lines (dep-arr pairs)
   const stationLineGroups = d3.group(data, (d) => d.stationID)
   stationLineGroups.forEach((points) => {
@@ -161,31 +199,49 @@ function drawMareyGraph(svgEl, data) {
       return acc
     }, [])
 
-    grouped.forEach((c) => {
-      if (c.arr > c.dep) {
-        g.append("line")
-          .attr("x1", x(c.arr))
-          .attr("y1", y(c.stationID))
-          .attr("x2", x(3600))
-          .attr("y2", y(c.stationID))
-          .attr("stroke", "black")
-          .attr("stroke-width", 1)
+    grouped.forEach((slot) => {
+      const keyArr = `${slot.stationID}-${slot.arr}`
+      const keyDep = `${slot.stationID}-${slot.dep}`
+      slotMap.set(keyArr, slot)
+      slotMap.set(keyDep, slot)
+    })
 
-        g.append("line")
-          .attr("x1", x(0))
-          .attr("y1", y(c.stationID))
-          .attr("x2", x(c.dep))
-          .attr("y2", y(c.stationID))
-          .attr("stroke", "black")
-          .attr("stroke-width", 1)
+    grouped.forEach((c) => {
+      const yPos = y(c.stationID)
+
+      if (c.arr > c.dep) {
+        // First rect: from arrival to end of scale
+        g.append("rect")
+          .attr("x", x(c.arr))
+          .attr("y", yPos - 1)
+          .attr("width", x(3600) - x(c.arr)) // assuming max time = 3600
+          .attr("height", 3)
+          .attr("fill", "black")
+          .style("cursor", "pointer")
+          .on("mouseover", (event) => showTooltip(event, c))
+          .on("mouseout", hideTooltip)
+
+        // Second rect: from 0 to departure
+        g.append("rect")
+          .attr("x", x(0))
+          .attr("y", yPos - 1)
+          .attr("width", x(c.dep) - x(0))
+          .attr("height", 3)
+          .attr("fill", "black")
+          .style("cursor", "pointer")
+          .on("mouseover", (event) => showTooltip(event, c))
+          .on("mouseout", hideTooltip)
       } else {
-        g.append("line")
-          .attr("x1", x(c.arr))
-          .attr("y1", y(c.stationID))
-          .attr("x2", x(c.dep))
-          .attr("y2", y(c.stationID))
-          .attr("stroke", "black")
-          .attr("stroke-width", 1)
+        // Normal case: single slot
+        g.append("rect")
+          .attr("x", x(c.arr))
+          .attr("y", yPos - 1)
+          .attr("width", x(c.dep) - x(c.arr))
+          .attr("height", 3)
+          .attr("fill", "black")
+          .style("cursor", "pointer")
+          .on("mouseover", (event) => showTooltip(event, c))
+          .on("mouseout", hideTooltip)
       }
     })
   })
@@ -212,8 +268,27 @@ function drawMareyGraph(svgEl, data) {
         d3.select(svg.value).selectAll(".floating-line").remove()
       }
     })
+    .on("mouseover", (event, d) => {
+      if (editorMode.value) return
+      const key = `${d.stationID}-${d.time}`
+      const slot = slotMap.get(key)
+      if (!slot) return
 
-  for (const conn of connectedStore.connections) {
+      tooltip.value.visible = true
+      tooltip.value.stationName = idToName.get(d.stationID)
+      tooltip.value.arrival = convertSecondstoTime(slot.arr)
+      tooltip.value.departure = convertSecondstoTime(slot.dep)
+      tooltip.value.style = {
+        left: `${event.pageX + 10}px`,
+        top: `${event.pageY + 10}px`,
+        position: "absolute",
+      }
+    })
+    .on("mouseout", hideTooltip)
+
+  for (const conn of connectedStore.connections.filter(
+    (c) => c.lineId == line.id,
+  )) {
     g.append("line")
       .attr("x1", x(conn.from.time))
       .attr("y1", y(conn.from.stationID))
@@ -245,5 +320,16 @@ g.axis text,
 g.axis line,
 g.axis path {
   pointer-events: none;
+}
+
+.tooltip {
+  position: absolute;
+  background: #333;
+  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 10;
 }
 </style>

@@ -6,8 +6,8 @@ export const useConnectedLinesStore = defineStore(
   () => {
     const connections = ref([])
 
-    function addConnection(from, to) {
-      connections.value.push({ from, to })
+    function addConnection(from, to, lineId) {
+      connections.value.push({ from, to, lineId })
     }
 
     function removeConnection(index) {
